@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>PROBABLY — A Detective in Probabilities</title>
+<link rel="icon" type="image/png" href="assets/icon-32.png">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { background:#070d18; }
+  body {
+    font-family:"DotGothic16", monospace;
+    color:#f2ead8;
+    max-width:480px; margin:0 auto; min-height:100vh;
+    background:linear-gradient(180deg,#0a1322 0%,#0d1830 60%,#0a1322 100%);
+    padding:16px 14px 40px;
+    -webkit-text-size-adjust:100%;
+  }
+  .screen { display:none; }
+  .screen.on { display:block; }
+
+  /* タイトル画面 */
+  #scr-title { text-align:center; padding-top:12px; }
+  #scr-title img.logo { width:100%; height:auto; border-radius:10px; box-shadow:0 6px 30px rgba(0,0,0,.6); }
+  .start-wrap { margin-top:22px; text-align:center; }
+  .ver { margin-top:18px; color:#8fa3c8; font-size:12px; letter-spacing:.15em; }
+
+  /* ボタン共通：枠いっぱい・左詰め・折り返しなし */
+  button {
+    font-family:inherit; cursor:pointer; color:#f2ead8;
+    background:#16233d; border:1px solid #35507e; border-radius:8px;
+    width:100%; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    padding:13px 14px; font-size:16px; margin-top:10px;
+  }
+  button:active { background:#1e3054; }
+  button:disabled { opacity:.38; cursor:default; }
+  button.accent { background:#6d4420; border-color:#d99a4e; color:#ffe9c9; }
+  button.accent:active { background:#855628; }
+  button.ghost { background:transparent; border-color:#2a3c5f; color:#aebedd; }
+  button.start {
+    width:auto; text-align:center; font-size:19px; padding:14px 42px;
+    background:#6d4420; border:1px solid #d99a4e; color:#ffe9c9; border-radius:10px;
+  }
+
+  h2.case-title { font-size:20px; color:#ffd9a0; margin:4px 0 8px; letter-spacing:.03em; }
+  .sub { color:#aebedd; font-size:13px; line-height:1.7; }
+  .intro { background:rgba(255,255,255,.045); border:1px solid #26395e; border-radius:8px; padding:12px 13px; font-size:14px; line-height:1.85; margin-top:10px; }
+
+  /* 調査画面 */
+  .hud { display:flex; justify-content:space-between; align-items:baseline; margin-top:6px; }
+  .hud .time { font-size:17px; color:#ffd9a0; }
+  .hud .time.low { color:#ff9a8a; }
+  .timebar { height:8px; background:#101b31; border:1px solid #26395e; border-radius:4px; margin-top:6px; overflow:hidden; }
+  .timebar > div { height:100%; background:linear-gradient(90deg,#d99a4e,#f3c078); transition:width .5s ease; }
+  .sec-label { margin-top:20px; font-size:13px; color:#8fa3c8; letter-spacing:.2em; }
+  .suspect { background:rgba(255,255,255,.045); border:1px solid #26395e; border-radius:8px; padding:10px 12px; margin-top:8px; }
+  .suspect .row { display:flex; justify-content:space-between; align-items:baseline; }
+  .suspect .name { font-size:16px; }
+  .suspect .role { color:#8fa3c8; font-size:12px; margin-left:8px; }
+  .suspect .pct { font-size:17px; color:#ffd9a0; }
+  .suspect.top { border-color:#d99a4e; }
+  .suspect .intro-s { color:#c6d2e8; font-size:12.5px; line-height:1.7; margin-top:5px; }
+  .bar { height:12px; background:#101b31; border-radius:6px; margin-top:7px; overflow:hidden; }
+  .bar > div { height:100%; background:linear-gradient(90deg,#7d9cc9,#a8c4ea); transition:width .7s ease; }
+  .suspect.top .bar > div { background:linear-gradient(90deg,#d99a4e,#ffd9a0); }
+
+  .ev-got { background:rgba(217,154,78,.08); border:1px solid #6d5426; border-radius:8px; padding:11px 13px; margin-top:10px; }
+  .ev-got .ev-name { font-size:15px; color:#ffd9a0; }
+  .ev-got .ev-text { font-size:13.5px; line-height:1.85; color:#e8e0cc; margin-top:6px; }
+  .ev-min { color:#8fa3c8; font-size:12.5px; }
+
+  /* 結果 */
+  .result-head { font-size:24px; margin-top:8px; }
+  .result-head.ok { color:#ffd9a0; }
+  .result-head.ng { color:#ff9a8a; }
+  .scorebox { background:rgba(255,255,255,.045); border:1px solid #26395e; border-radius:8px; padding:12px 13px; margin-top:12px; font-size:15px; line-height:2; }
+  .scorebox .rank { font-size:26px; color:#ffd9a0; }
+  .best { color:#8fa3c8; font-size:13px; margin-top:8px; }
+</style>
+</head>
+<body>
+
+<!-- タイトル画面 -->
+<div id="scr-title" class="screen on">
+  <img class="logo" src="assets/logo-probably.jpg" alt="PROBABLY — A Detective in Probabilities">
+  <div class="start-wrap"><button class="start" id="btn-start">調査をはじめる</button></div>
+  <div class="ver">PROBABLY v0.1</div>
+</div>
+
+<!-- 事件選択 -->
+<div id="scr-cases" class="screen">
+  <h2 class="case-title">事件ファイル</h2>
+  <div class="sub">証拠を集めると、容疑者それぞれの「犯人である確率」が動く。制限時間の中で集める証拠を選び、確信が持てたら名指しする。</div>
+  <div id="case-list"></div>
+  <button class="ghost" id="btn-to-title">タイトルへ戻る</button>
+</div>
+
+<!-- 調査画面 -->
+<div id="scr-play" class="screen">
+  <h2 class="case-title" id="play-title"></h2>
+  <div class="hud"><span class="sub" id="deadline-reason"></span><span class="time" id="time-left"></span></div>
+  <div class="timebar"><div id="time-fill" style="width:100%"></div></div>
+  <div class="intro" id="play-intro"></div>
+  <div class="sec-label">容疑者 ― 犯人である確率</div>
+  <div id="suspects"></div>
+  <div class="sec-label">証拠を集める</div>
+  <div id="evidences"></div>
+  <button class="accent" id="btn-accuse">名指しする</button>
+  <button class="ghost" id="btn-quit">事件を諦める（選択へ戻る）</button>
+</div>
+
+<!-- 名指し画面 -->
+<div id="scr-accuse" class="screen">
+  <h2 class="case-title">誰を名指しする？</h2>
+  <div class="sub">一度名指ししたら取り消せない。誤認は大きな減点になる。</div>
+  <div id="accuse-list"></div>
+  <button class="ghost" id="btn-back-play">調査へ戻る</button>
+</div>
+
+<!-- 結果画面 -->
+<div id="scr-result" class="screen">
+  <div class="result-head" id="result-head"></div>
+  <div class="intro" id="result-text"></div>
+  <div class="sec-label">最終的な確率</div>
+  <div id="result-suspects"></div>
+  <div class="scorebox" id="scorebox"></div>
+  <button class="accent" id="btn-to-cases">事件ファイルへ</button>
+  <button class="ghost" id="btn-retry">この事件をやり直す</button>
+</div>
+
+<script>
+"use strict";
+// ===== 台本データ（事件JSONと同一内容。検証は verify-case.mjs で実施） =====
+const CASES = [
+{
+  "id": "case-001",
+  "title": "雨の夜、消えた売上金",
+  "difficulty": 1,
+  "intro": "商店街の小さなバー「灯」。雨の夜、閉店間際に突然の停電が起きた。電気が戻ったとき、レジ横に置いてあった売上金の封筒が消えていた。その夜、店の中にいたのは3人だけ。朝になれば酒屋の回収便が来て、空の瓶ケースは全部持っていかれてしまう。それまでに、誰が取ったのかを名指ししなければならない。",
+  "deadline": { "minutes": 150, "reason": "朝の回収便が瓶ケースを持ち去るまで" },
+  "culprit": "saeki",
+  "solution": "決め手は瓶ケースだ。売上金は朝の回収便で運び出すために、空の瓶ケースに隠されていた。それを扱えるのは配達員の佐伯だけだ。ブレーカーを落として暗闇を作り、裏口からレジ裏へ――足跡も、エンジン音も、全部つながる。高木には動機があったし、三島の指紋もあった。だが確率が指し示したのは、最初からずっと、佐伯だった。",
+  "suspects": [
+    { "id": "takagi", "name": "高木 蓮", "role": "バーの見習い店員", "intro": "働き始めて半年の若手。手際はいいが、最近元気がない。店の裏口や配電盤の場所は知っている。", "prior": 0.3333 },
+    { "id": "mishima", "name": "三島 圭", "role": "常連客", "intro": "毎晩のように来る常連。停電のとき「トイレに行っていた」と言う。以前、忙しい日にレジ打ちを手伝ったことがある。", "prior": 0.3333 },
+    { "id": "saeki", "name": "佐伯 徹", "role": "酒屋の配達員", "intro": "その夜、閉店前に酒を届けに来た。配達ではいつも裏口を使い、空の瓶ケースを回収していく。", "prior": 0.3334 }
+  ],
+  "evidences": [
+    { "id": "ev-breaker", "name": "落とされたブレーカー", "minutes": 30, "text": "配電盤を見ると、ブレーカーは故障ではなく、人の手で落とされた形跡があった。停電は偶然ではない。誰かが暗闇を必要とした。ブレーカーの場所を知っているのは、店に出入りする人間だけだ。", "likelihoods": { "takagi": 0.4, "mishima": 0.1, "saeki": 0.7 } },
+    { "id": "ev-footprints", "name": "裏口からの濡れた足跡", "minutes": 40, "text": "裏口からレジ裏まで、濡れた足跡が続いていた。雨の中を外から来て、裏口を通った者の足跡だ。表の客席側には、こんな足跡はない。", "likelihoods": { "takagi": 0.2, "mishima": 0.15, "saeki": 0.75 } },
+    { "id": "ev-debt", "name": "高木のスマホの督促メッセージ", "minutes": 20, "text": "高木のスマホには、借金の督促メッセージが何通も届いていた。金に困っているのは確かだ。だが、動機があることと、やったことは、別の話だ。", "likelihoods": { "takagi": 0.7, "mishima": 0.2, "saeki": 0.2 } },
+    { "id": "ev-bottlecase", "name": "重すぎる瓶ケース", "minutes": 50, "text": "回収予定の空の瓶ケースのうち1箱だけ、やけに重い。中を改めると、瓶の間に売上金の封筒が隠してあった。朝の回収便で、そのまま店の外へ運び出すつもりだったらしい。", "likelihoods": { "takagi": 0.1, "mishima": 0.05, "saeki": 0.85 } },
+    { "id": "ev-engine", "name": "停電の瞬間のエンジン音", "minutes": 30, "text": "向かいの店の主人が言うには、停電の直前、店の裏手で車のエンジンがかかる音がした。裏の路地に車を停められるのは、配達の車くらいだ。", "likelihoods": { "takagi": 0.2, "mishima": 0.1, "saeki": 0.6 } },
+    { "id": "ev-fingerprint", "name": "レジの引き出しの指紋", "minutes": 40, "text": "レジの引き出しから三島の指紋が出た。だが三島は以前、忙しい日にレジ打ちを手伝ったことがある。指紋があること自体は、あの夜に触った証拠にはならない。", "likelihoods": { "takagi": 0.2, "mishima": 0.55, "saeki": 0.15 } }
+  ]
+}
+];
+
+// ===== セーブ（端末の localStorage） =====
+const SAVE_KEY = "probably-save-v1";
+const loadSave = () => { try { return JSON.parse(localStorage.getItem(SAVE_KEY)) || { best: {} }; } catch (e) { return { best: {} }; } };
+const storeSave = (s) => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(s)); } catch (e) {} };
+
+// ===== 状態 =====
+let cur = null; // { case, got:Set, used:number, probs:{} }
+
+const $ = (id) => document.getElementById(id);
+const show = (id) => { document.querySelectorAll(".screen").forEach(el => el.classList.remove("on")); $(id).classList.add("on"); window.scrollTo(0, 0); };
+const pct = (v) => (v * 100).toFixed(1) + "%";
+
+// ベイズ更新： 事前確率 × 集めた証拠の尤度 → 正規化
+function computeProbs(c, got) {
+  const w = {};
+  for (const s of c.suspects) {
+    w[s.id] = s.prior;
+    for (const ev of c.evidences) if (got.has(ev.id)) w[s.id] *= ev.likelihoods[s.id];
+  }
+  const sum = Object.values(w).reduce((a, b) => a + b, 0);
+  const p = {};
+  for (const s of c.suspects) p[s.id] = w[s.id] / sum;
+  return p;
+}
+const topId = (c, p) => c.suspects.reduce((a, b) => (p[a.id] >= p[b.id] ? a : b)).id;
+
+// ===== 事件選択 =====
+function renderCases() {
+  const save = loadSave();
+  const list = $("case-list");
+  list.innerHTML = "";
+  for (const c of CASES) {
+    const b = document.createElement("button");
+    const best = save.best[c.id];
+    b.textContent = `事件${c.difficulty}「${c.title}」` + (best ? `　―　ベスト ${best.score}点（ランク${best.rank}）` : "");
+    b.addEventListener("click", () => startCase(c));
+    list.appendChild(b);
+  }
+  const note = document.createElement("div");
+  note.className = "sub";
+  note.style.marginTop = "12px";
+  note.textContent = "事件2〜5は制作中。";
+  list.appendChild(note);
+}
+
+// ===== 調査 =====
+function startCase(c) {
+  cur = { case: c, got: new Set(), used: 0, probs: computeProbs(c, new Set()) };
+  renderPlay();
+  show("scr-play");
+}
+function renderPlay() {
+  const c = cur.case;
+  const left = c.deadline.minutes - cur.used;
+  $("play-title").textContent = `事件${c.difficulty}「${c.title}」`;
+  $("deadline-reason").textContent = "期限： " + c.deadline.reason;
+  const t = $("time-left");
+  t.textContent = `残り ${left} 分`;
+  t.className = "time" + (left <= 30 ? " low" : "");
+  $("time-fill").style.width = (left / c.deadline.minutes * 100) + "%";
+  $("play-intro").textContent = c.intro;
+  renderSuspects($("suspects"), c, cur.probs);
+  const box = $("evidences");
+  box.innerHTML = "";
+  for (const ev of c.evidences) {
+    if (cur.got.has(ev.id)) {
+      const d = document.createElement("div");
+      d.className = "ev-got";
+      d.innerHTML = "";
+      const n = document.createElement("div"); n.className = "ev-name"; n.textContent = "✓ " + ev.name;
+      const tx = document.createElement("div"); tx.className = "ev-text"; tx.textContent = ev.text;
+      d.appendChild(n); d.appendChild(tx);
+      box.appendChild(d);
+    } else {
+      const b = document.createElement("button");
+      b.textContent = `${ev.name}（${ev.minutes}分）`;
+      if (ev.minutes > left) { b.disabled = true; b.textContent = `${ev.name}（${ev.minutes}分 ― 時間が足りない）`; }
+      b.addEventListener("click", () => {
+        cur.got.add(ev.id);
+        cur.used += ev.minutes;
+        cur.probs = computeProbs(c, cur.got);
+        renderPlay();
+      });
+      box.appendChild(b);
+    }
+  }
+}
+function renderSuspects(box, c, p) {
+  box.innerHTML = "";
+  const top = topId(c, p);
+  for (const s of c.suspects) {
+    const d = document.createElement("div");
+    d.className = "suspect" + (s.id === top ? " top" : "");
+    const row = document.createElement("div"); row.className = "row";
+    const nm = document.createElement("span");
+    const nameSpan = document.createElement("span"); nameSpan.className = "name"; nameSpan.textContent = s.name;
+    const roleSpan = document.createElement("span"); roleSpan.className = "role"; roleSpan.textContent = s.role;
+    nm.appendChild(nameSpan); nm.appendChild(roleSpan);
+    const pc = document.createElement("span"); pc.className = "pct"; pc.textContent = pct(p[s.id]);
+    row.appendChild(nm); row.appendChild(pc);
+    const bar = document.createElement("div"); bar.className = "bar";
+    const fill = document.createElement("div"); fill.style.width = (p[s.id] * 100) + "%";
+    bar.appendChild(fill);
+    const intro = document.createElement("div"); intro.className = "intro-s"; intro.textContent = s.intro;
+    d.appendChild(row); d.appendChild(bar); d.appendChild(intro);
+    box.appendChild(d);
+  }
+}
+
+// ===== 名指し =====
+function renderAccuse() {
+  const c = cur.case;
+  const list = $("accuse-list");
+  list.innerHTML = "";
+  for (const s of c.suspects) {
+    const b = document.createElement("button");
+    b.textContent = `${s.name}（${s.role}） ― 現在 ${pct(cur.probs[s.id])}`;
+    b.addEventListener("click", () => finish(s.id));
+    list.appendChild(b);
+  }
+  show("scr-accuse");
+}
+
+// ===== 結果と評価（v0.1 暫定値： 基礎点＝名指し時の確率、速さボーナス＝残り時間の割合×20点） =====
+function rankOf(score) { return score >= 100 ? "S" : score >= 85 ? "A" : score >= 65 ? "B" : "C"; }
+function finish(accusedId) {
+  const c = cur.case;
+  const p = cur.probs;
+  const left = c.deadline.minutes - cur.used;
+  const ok = accusedId === c.culprit;
+  const head = $("result-head");
+  const text = $("result-text");
+  const box = $("scorebox");
+  renderSuspects($("result-suspects"), c, p);
+  if (ok) {
+    const base = Math.round(p[accusedId] * 1000) / 10;
+    const bonus = Math.round(left / c.deadline.minutes * 20);
+    const score = Math.round((base + bonus) * 10) / 10;
+    const rank = rankOf(score);
+    head.textContent = "名指しは正しかった";
+    head.className = "result-head ok";
+    text.textContent = c.solution;
+    box.innerHTML = "";
+    const l1 = document.createElement("div"); l1.textContent = `基礎点（名指し時の確率）： ${base} 点`;
+    const l2 = document.createElement("div"); l2.textContent = `速さボーナス（残り ${left} 分）： +${bonus} 点`;
+    const l3 = document.createElement("div"); l3.textContent = `合計： ${score} 点`;
+    const l4 = document.createElement("div"); l4.innerHTML = `ランク： <span class="rank">${rank}</span>`;
+    box.appendChild(l1); box.appendChild(l2); box.appendChild(l3); box.appendChild(l4);
+    const save = loadSave();
+    const prev = save.best[c.id];
+    if (!prev || score > prev.score) { save.best[c.id] = { score, rank }; storeSave(save); }
+    const bestNote = document.createElement("div");
+    bestNote.className = "best";
+    bestNote.textContent = `この事件のベスト： ${save.best[c.id].score} 点（ランク${save.best[c.id].rank}）`;
+    box.appendChild(bestNote);
+  } else {
+    const culprit = c.suspects.find(s => s.id === c.culprit);
+    head.textContent = "誤認 ― その人は犯人ではなかった";
+    head.className = "result-head ng";
+    text.textContent = `名指しした相手の確率は ${pct(p[accusedId])} だった。確率が低いうちの名指しは、冤罪の危険と隣り合わせだ。事件は失敗として記録される。もう一度、証拠の集め方からやり直そう。`;
+    box.innerHTML = "";
+    const l1 = document.createElement("div"); l1.textContent = "スコア： 0 点（誤認のため記録なし）";
+    box.appendChild(l1);
+  }
+  show("scr-result");
+}
+
+// ===== 画面遷移 =====
+$("btn-start").addEventListener("click", () => { renderCases(); show("scr-cases"); });
+$("btn-to-title").addEventListener("click", () => show("scr-title"));
+$("btn-accuse").addEventListener("click", renderAccuse);
+$("btn-back-play").addEventListener("click", () => show("scr-play"));
+$("btn-quit").addEventListener("click", () => { renderCases(); show("scr-cases"); });
+$("btn-to-cases").addEventListener("click", () => { renderCases(); show("scr-cases"); });
+$("btn-retry").addEventListener("click", () => startCase(cur.case));
+</script>
+</body>
+</html>
