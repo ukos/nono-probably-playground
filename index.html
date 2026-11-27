@@ -7,12 +7,12 @@
 <link rel="icon" type="image/png" href="assets/icon-32.png">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   html,body { background:#070d18; }
   body {
-    font-family:"DotGothic16", monospace;
+    font-family:"M PLUS Rounded 1c", sans-serif;
     color:#f2ead8;
     max-width:480px; margin:0 auto; min-height:100vh;
     background:linear-gradient(180deg,#0a1322 0%,#0d1830 60%,#0a1322 100%);
@@ -45,7 +45,7 @@
     background:#6d4420; border:1px solid #d99a4e; color:#ffe9c9; border-radius:10px;
   }
 
-  h2.case-title { font-size:20px; color:#ffd9a0; margin:4px 0 8px; letter-spacing:.03em; }
+  h2.case-title { font-size:20px; font-weight:700; color:#ffd9a0; margin:4px 0 8px; letter-spacing:.03em; }
   .sub { color:#aebedd; font-size:13px; line-height:1.7; }
   .intro { background:rgba(255,255,255,.045); border:1px solid #26395e; border-radius:8px; padding:12px 13px; font-size:14px; line-height:1.85; margin-top:10px; }
 
@@ -58,9 +58,9 @@
   .sec-label { margin-top:20px; font-size:13px; color:#8fa3c8; letter-spacing:.2em; }
   .suspect { background:rgba(255,255,255,.045); border:1px solid #26395e; border-radius:8px; padding:10px 12px; margin-top:8px; }
   .suspect .row { display:flex; justify-content:space-between; align-items:baseline; }
-  .suspect .name { font-size:16px; }
+  .suspect .name { font-size:16px; font-weight:700; }
   .suspect .role { color:#8fa3c8; font-size:12px; margin-left:8px; }
-  .suspect .pct { font-size:17px; color:#ffd9a0; }
+  .suspect .pct { font-size:17px; font-weight:700; color:#ffd9a0; }
   .suspect.top { border-color:#d99a4e; }
   .suspect .intro-s { color:#c6d2e8; font-size:12.5px; line-height:1.7; margin-top:5px; }
   .bar { height:12px; background:#101b31; border-radius:6px; margin-top:7px; overflow:hidden; }
@@ -73,7 +73,7 @@
   .ev-min { color:#8fa3c8; font-size:12.5px; }
 
   /* 結果 */
-  .result-head { font-size:24px; margin-top:8px; }
+  .result-head { font-size:24px; font-weight:700; margin-top:8px; }
   .result-head.ok { color:#ffd9a0; }
   .result-head.ng { color:#ff9a8a; }
   .scorebox { background:rgba(255,255,255,.045); border:1px solid #26395e; border-radius:8px; padding:12px 13px; margin-top:12px; font-size:15px; line-height:2; }
@@ -87,7 +87,7 @@
 <div id="scr-title" class="screen on">
   <img class="logo" src="assets/logo-probably.jpg" alt="PROBABLY — A Detective in Probabilities">
   <div class="start-wrap"><button class="start" id="btn-start">調査をはじめる</button></div>
-  <div class="ver">PROBABLY v0.5</div>
+  <div class="ver">PROBABLY v0.5.1</div>
 </div>
 
 <!-- 事件選択 -->
