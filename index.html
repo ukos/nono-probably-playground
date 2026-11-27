@@ -87,7 +87,7 @@
 <div id="scr-title" class="screen on">
   <img class="logo" src="assets/logo-probably.jpg" alt="PROBABLY — A Detective in Probabilities">
   <div class="start-wrap"><button class="start" id="btn-start">調査をはじめる</button></div>
-  <div class="ver">PROBABLY v0.1</div>
+  <div class="ver">PROBABLY v0.2</div>
 </div>
 
 <!-- 事件選択 -->
@@ -156,7 +156,8 @@ const CASES = [
     { "id": "ev-engine", "name": "停電の瞬間のエンジン音", "minutes": 30, "text": "向かいの店の主人が言うには、停電の直前、店の裏手で車のエンジンがかかる音がした。裏の路地に車を停められるのは、配達の車くらいだ。", "likelihoods": { "takagi": 0.2, "mishima": 0.1, "saeki": 0.6 } },
     { "id": "ev-fingerprint", "name": "レジの引き出しの指紋", "minutes": 40, "text": "レジの引き出しから三島の指紋が出た。だが三島は以前、忙しい日にレジ打ちを手伝ったことがある。指紋があること自体は、あの夜に触った証拠にはならない。", "likelihoods": { "takagi": 0.2, "mishima": 0.55, "saeki": 0.15 } }
   ]
-}
+},
+{"culprit":"todo","deadline":{"minutes":180,"reason":"夜勤スタッフが退館する朝6時の交代まで"},"difficulty":2,"evidences":[{"id":"ev-fingerprint2","likelihoods":{"kanda":0.2,"nishimura":0.75,"ono":0.15,"todo":0.1},"minutes":30,"name":"試作機ケースの指紋","text":"試作機ケースの留め具から、西村の指紋が出た。だが西村はその日の夕方、試作機をケースに収めた本人だ。指紋があって当然の場所だった。"},{"id":"ev-mail","likelihoods":{"kanda":0.65,"nishimura":0.2,"ono":0.1,"todo":0.15},"minutes":30,"name":"神田の転職メール","text":"神田の送信履歴に、競合他社の人事宛てのメールがあった。転職活動は本当らしい。だが試作機とは関係のない、数週間前から続くやり取りだった。"},{"id":"ev-keylog","likelihoods":{"kanda":0.05,"nishimura":0.05,"ono":0.3,"todo":0.8},"minutes":40,"name":"マスターキーの使用記録","text":"保管室の電子錠は、深夜2時13分にマスターキーで開けられていた。その夜、マスターキーを預かっているのは夜間警備の藤堂だけだ。"},{"id":"ev-camera","likelihoods":{"kanda":0.1,"nishimura":0.1,"ono":0.5,"todo":0.75},"minutes":50,"name":"防犯カメラの死角","text":"フロアの防犯カメラには、深夜、保管室の前を通る人影が映っていなかった。犯人はカメラの死角になる非常階段側の動線を使ったらしい。その死角の位置を知っているのは、巡回する警備員と、裏動線を使う清掃スタッフくらいだ。"},{"id":"ev-patrolgap","likelihoods":{"kanda":0.1,"nishimura":0.1,"ono":0.15,"todo":0.85},"minutes":40,"name":"巡回記録の空白17分","text":"藤堂の巡回記録には、2時05分から2時22分まで、17分間の空白がある。本人は「仮眠していた」と言う。"},{"id":"ev-glove","likelihoods":{"kanda":0.1,"nishimura":0.1,"ono":0.55,"todo":0.4},"minutes":30,"name":"裏口のゴミ箱の手袋","text":"裏口のゴミ箱に、使い捨ての薄手手袋が捨ててあった。清掃用にも見えるが、サイズは大きめで、内側には汗の跡があった。"},{"id":"ev-badge","likelihoods":{"kanda":0.35,"nishimura":0.05,"ono":0.4,"todo":0.5},"minutes":20,"name":"入館バッジの記録","text":"入館バッジの記録では、西村は23時07分に退館している。試作機が消えたのは深夜2時前後だ。ただしバッジの貸し借りまでは、記録には残らない。"}],"id":"case-002","intro":"デザイン事務所「スタジオ・ノルド」の発表前夜。翌朝の発表会で披露するはずの新型端末の試作機が、保管室から消えた。電子錠はマスターキーで開けられ、防犯カメラには何も映っていない。午前3時、その夜ビルにいたのは4人だけだった。夜勤スタッフは午前6時の交代で帰ってしまう。それまでに、誰が持ち出したのかを名指ししなければならない。","solution":"決め手は、マスターキーと巡回記録の空白だ。保管室を開けられたのは藤堂だけで、カメラの死角を知っていたのも藤堂だった。空白の17分のあいだに非常階段を抜け、手袋をして試作機を持ち出した。西村の指紋は夕方の作業のもの、神田のメールはただの転職活動だった。最初に目につく証拠ほど、当てにはならない。","suspects":[{"id":"nishimura","intro":"試作機の組み立てを担当した若手。夕方、試作機をケースに収めて保管室に入れた。最近、別のプロジェクトへ異動の噂がある。","name":"西村 翔","prior":0.25,"role":"後輩エンジニア"},{"id":"ono","intro":"夜間の清掃を一人で担当している。フロアの鍵を持ち、裏動線を隅々まで知っている。","name":"大野 敏江","prior":0.25,"role":"夜間清掃スタッフ"},{"id":"kanda","intro":"試作機プロジェクトの責任者。発表会の準備で深夜まで残っていた。競合他社への転職が噂されている。","name":"神田 玲子","prior":0.25,"role":"プロジェクトマネージャー"},{"id":"todo","intro":"その夜の警備を一人で担当。マスターキーを預かり、ビルの巡回路とカメラの位置を把握している。","name":"藤堂 厳","prior":0.25,"role":"夜間警備員"}],"title":"発表前夜、消えた試作機"}
 ];
 
 // ===== セーブ（端末の localStorage） =====
@@ -190,17 +191,23 @@ function renderCases() {
   const save = loadSave();
   const list = $("case-list");
   list.innerHTML = "";
-  for (const c of CASES) {
+  CASES.forEach((c, i) => {
     const b = document.createElement("button");
     const best = save.best[c.id];
-    b.textContent = `事件${c.difficulty}「${c.title}」` + (best ? `　―　ベスト ${best.score}点（ランク${best.rank}）` : "");
-    b.addEventListener("click", () => startCase(c));
+    const unlocked = i === 0 || !!save.best[CASES[i - 1].id];
+    if (!unlocked) {
+      b.disabled = true;
+      b.textContent = `事件${c.difficulty}「${c.title}」（事件${CASES[i - 1].difficulty}を解決すると開く）`;
+    } else {
+      b.textContent = `事件${c.difficulty}「${c.title}」` + (best ? `　―　ベスト ${best.score}点（ランク${best.rank}）` : "");
+      b.addEventListener("click", () => startCase(c));
+    }
     list.appendChild(b);
-  }
+  });
   const note = document.createElement("div");
   note.className = "sub";
   note.style.marginTop = "12px";
-  note.textContent = "事件2〜5は制作中。";
+  note.textContent = "事件3〜5は制作中。";
   list.appendChild(note);
 }
 
